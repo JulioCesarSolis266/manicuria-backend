@@ -1,94 +1,95 @@
-import { PrismaClient } from "@prisma/client";
-import mError from "../middlewares/mError.js";
+import { PrismaClient } from "@prisma/client"
+import mError from "../middlewares/mError.js"
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 const cClient = {
-  // Create a new client
+  // Crear un nuevo cliente
   create: async (req, res) => {
     try {
-      const { name, phone, notes } = req.body;
+      const { name, phone, notes } = req.body
 
       if (!name || !phone) {
-        return mError.e400(res, "name and phone are required");
+        return mError.e400(res, "Los campos name y phone son obligatorios")
       }
 
       const newClient = await prisma.client.create({
         data: {
           name,
           phone,
-          notes: notes || null,
-        },
-      });
+          notes: notes || null
+        }
+      })
 
-      res.status(201).json({ message: "Client created", client: newClient });
+      res.status(201).json({ message: "Cliente creado", client: newClient })
     } catch (error) {
-      mError.e500(res, "Error creating client", error);
+      mError.e500(res, "Error al crear el cliente", error)
     }
   },
 
-  // Get all clients
+  // Obtener todos los clientes
   getAll: async (req, res) => {
     try {
       const clients = await prisma.client.findMany({
-        include: {
-          appointments: true, // include related appointments
-        },
-      });
-      res.status(200).json(clients);
+        include: { appointments: true }
+      })
+
+      if (clients.length === 0) {
+        return res.status(200).json({ clients: [], message: "No hay clientes registrados" })
+      }
+
+      res.status(200).json({ clients })
     } catch (error) {
-      mError.e500(res, "Error fetching clients", error);
+      mError.e500(res, "Error al obtener los clientes", error)
     }
   },
 
-  // Get a client by ID
+  // Obtener un cliente por ID
   getOne: async (req, res) => {
     try {
-      const { id } = req.params;
+      const { id } = req.params
       const client = await prisma.client.findUnique({
         where: { id: parseInt(id) },
-        include: { appointments: true },
-      });
+        include: { appointments: true }
+      })
 
-      if (!client) return mError.e404(res, "Client not found");
+      if (!client) return mError.e404(res, "Cliente no encontrado")
 
-      res.status(200).json(client);
+      res.status(200).json(client)
     } catch (error) {
-      mError.e500(res, "Error fetching client", error);
+      mError.e500(res, "Error al obtener el cliente", error)
     }
   },
 
-  // Update a client
+  // Actualizar un cliente
   update: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { name, phone, notes } = req.body;
+      const { id } = req.params
+      const { name, phone, notes } = req.body
 
       const updatedClient = await prisma.client.update({
         where: { id: parseInt(id) },
-        data: { name, phone, notes },
-      });
+        data: { name, phone, notes }
+      })
 
-      res.status(200).json({ message: "Client updated", client: updatedClient });
+      res.status(200).json({ message: "Cliente actualizado", client: updatedClient })
     } catch (error) {
-      mError.e500(res, "Error updating client", error);
+      mError.e500(res, "Error al actualizar el cliente", error)
     }
   },
 
-  // Delete a client
+  // Eliminar un cliente
   delete: async (req, res) => {
     try {
-      const { id } = req.params;
+      const { id } = req.params
 
-      await prisma.client.delete({
-        where: { id: parseInt(id) },
-      });
+      await prisma.client.delete({ where: { id: parseInt(id) } })
 
-      res.status(200).json({ message: "Client deleted" });
+      res.status(200).json({ message: "Cliente eliminado" })
     } catch (error) {
-      mError.e500(res, "Error deleting client", error);
+      mError.e500(res, "Error al eliminar el cliente", error)
     }
-  },
-};
+  }
+}
 
-export default cClient;
+export default cClient

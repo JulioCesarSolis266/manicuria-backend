@@ -7,6 +7,8 @@ import rAuth from "./src/routes/rAuth.js"
 import rAppointment from "./src/routes/rAppointment.js"
 import rUser from "./src/routes/rUser.js"
 import rClient from "./src/routes/rClient.js"
+import rAppointmentFilter from "./src/routes/rAppointmentFilter.js"
+import dashboardRoutes from "./src/routes/rDashboard.js"
 
 // Middleware de errores
 import mError from "./src/middlewares/mError.js"
@@ -24,6 +26,8 @@ app.use("/api/auth", rAuth)
 app.use("/api/appointments", rAppointment)
 app.use("/api/users", rUser)
 app.use("/api/clients", rClient);
+app.use("/api/appointments/filter", rAppointmentFilter)
+app.use("/api/dashboard", dashboardRoutes)
 
 // Middleware para manejar rutas no encontradas
 app.use((req, res, next) => {
