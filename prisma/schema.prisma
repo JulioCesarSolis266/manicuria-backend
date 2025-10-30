@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int           @id @default(autoincrement())
+  username         String        @unique
+  password         String
+  createdAt        DateTime      @default(now())
+  isActive         Boolean       @default(true)
+  appointmentsCreated Appointment[] @relation("AppointmentsCreated")
+  appointmentsAttended Appointment[] @relation("AppointmentsAttended")
+}
+
+model Client {
+  id            Int           @id @default(autoincrement())
+  name          String
+  phone         String
+  notes         String?
+  createdAt     DateTime      @default(now())
+  appointments  Appointment[]
+}
+
+model Appointment {
+  id             Int       @id @default(autoincrement())
+  service        String
+  date           DateTime
+  status         String    @default("pending")
+  clientId       Int
+  client         Client    @relation(fields: [clientId], references: [id])
+  createdById    Int
+  createdBy      User      @relation("AppointmentsCreated", fields: [createdById], references: [id])
+  attendedById   Int?
+  attendedBy     User?     @relation("AppointmentsAttended", fields: [attendedById], references: [id])
+  createdAt      DateTime  @default(now())
+}
+
+
