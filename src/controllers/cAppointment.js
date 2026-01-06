@@ -5,10 +5,10 @@ const prisma = new PrismaClient()
 
 const cAppointment = {
 
-  // Crear una nueva cita
+  // Crear una nueva cita (MVP)
   create: async (req, res) => {
     try {
-      const { date, clientId} = req.body
+      const { date, clientId } = req.body
 
       const clientIdNumber = parseInt(clientId)
 
@@ -19,18 +19,7 @@ const cAppointment = {
       const createdById = req.user.id
       const dateObj = new Date(date)
 
-      // Validar conflicto de horarios
-      const existing = await prisma.appointment.findFirst({
-        where: {
-          date: dateObj
-        }
-      })
-
-      if (existing) {
-        return mError.e400(res, "Ya existe un turno en esa fecha y hora con la misma manicura.")
-      }
-
-      // Crear turno
+      // Crear turno sin servicio ni empleada
       const newAppointment = await prisma.appointment.create({
         data: {
           date: dateObj,
@@ -53,7 +42,6 @@ const cAppointment = {
     }
   },
 
-
   // Obtener todas las citas
   getAll: async (req, res) => {
     try {
@@ -64,20 +52,12 @@ const cAppointment = {
         }
       })
 
-      if (appointments.length === 0) {
-        return res.status(200).json({
-          appointments: [],
-          message: "No hay citas registradas"
-        })
-      }
-
       res.status(200).json({ appointments })
 
     } catch (error) {
       mError.e500(res, "Error al obtener las citas", error)
     }
   },
-
 
   // Obtener cita por ID
   getOne: async (req, res) => {
@@ -103,7 +83,6 @@ const cAppointment = {
     }
   },
 
-
   // Actualizar cita
   update: async (req, res) => {
     try {
@@ -121,18 +100,6 @@ const cAppointment = {
       }
 
       const newDate = date ? new Date(date) : existingAppointment.date
-
-      // Validación conflicto
-      const conflict = await prisma.appointment.findFirst({
-        where: {
-          id: { not: appointmentId },
-          date: newDate
-        }
-      })
-
-      if (conflict) {
-        return mError.e400(res, "Ya existe otra cita en esa fecha y hora para esa manicura.")
-      }
 
       const updatedAppointment = await prisma.appointment.update({
         where: { id: appointmentId },
@@ -156,7 +123,6 @@ const cAppointment = {
       mError.e500(res, "Error al actualizar la cita", error)
     }
   },
-
 
   // Eliminar cita
   delete: async (req, res) => {
