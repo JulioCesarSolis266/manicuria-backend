@@ -10,8 +10,8 @@ const cUser = {
     try {
       const users = await prisma.user.findMany({
         where: { isActive: true },
-        select: { id: true, username: true, createdAt: true },
-        orderBy: { createdAt: "asc" },
+        select: { id: true, username: true, role: true, createdAt: true },
+        orderBy: { createdAt: "desc" },
       })
 
       res.status(200).json({ users })

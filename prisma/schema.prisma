@@ -13,37 +13,86 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+// USERS (Manicuras dueñas de la app)
 model User {
-  id               Int           @id @default(autoincrement())
-  username         String        @unique
-  password         String
-  createdAt        DateTime      @default(now())
-  isActive         Boolean       @default(true)
-  appointmentsCreated Appointment[] @relation("AppointmentsCreated")
-  appointmentsAttended Appointment[] @relation("AppointmentsAttended")
+  id                     Int           @id @default(autoincrement())
+  username               String        @unique
+  password               String
+  role                   String        @default("user")
+  forcePasswordReset     Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  isActive               Boolean       @default(true)
+
+  // Relación vieja: quien crea el turno
+  appointmentsCreated    Appointment[] @relation("AppointmentsCreated")
 }
 
+
+// EMPLOYEES (Empleadas de la manicura)
+// model Employee {
+//   id          Int            @id @default(autoincrement())
+//   userId      Int?           // opcional, por si más adelante deseas login
+
+//   name        String
+//   phone       String?
+//   isActive    Boolean        @default(true)
+//   createdAt   DateTime       @default(now())
+
+//   // Relación con turnos asignados a esta empleada
+//   appointments Appointment[] @relation("EmployeeAppointments")
+// }
+
+
+// CLIENTS (Clientes finales)
 model Client {
   id            Int           @id @default(autoincrement())
   name          String
   phone         String
   notes         String?
   createdAt     DateTime      @default(now())
+
   appointments  Appointment[]
 }
 
+
+// SERVICES (Servicios ofrecidos)
+// model Service {
+//   id              Int          @id @default(autoincrement())
+//   name            String
+//   price           Float
+//   durationMinutes Int          // duración del servicio
+//   category        String?
+//   description     String?
+//   isActive        Boolean       @default(true)
+//   createdAt       DateTime      @default(now())
+
+//   appointments    Appointment[]
+// }
+
+
+// APPOINTMENTS (Turnos)
 model Appointment {
-  id             Int       @id @default(autoincrement())
-  service        String
+  id             Int        @id @default(autoincrement())
+
+  // Servicio referenciado
+  serviceId      Int
+  service        Service    @relation(fields: [serviceId], references: [id])
+
   date           DateTime
-  status         String    @default("pending")
+  status         String     @default("pending")
+
+  // Cliente
   clientId       Int
-  client         Client    @relation(fields: [clientId], references: [id])
+  client         Client     @relation(fields: [clientId], references: [id])
+
+  // Usuario que creó el turno (la manicura jefa)
   createdById    Int
-  createdBy      User      @relation("AppointmentsCreated", fields: [createdById], references: [id])
-  attendedById   Int?
-  attendedBy     User?     @relation("AppointmentsAttended", fields: [attendedById], references: [id])
-  createdAt      DateTime  @default(now())
+  createdBy      User       @relation("AppointmentsCreated", fields: [createdById], references: [id])
+
+  // Empleada que atiende el turno
+  employeeId     Int?
+  employee       Employee?  @relation("EmployeeAppointments", fields: [employeeId], references: [id])
+
+  createdAt      DateTime   @default(now())
 }
-
-

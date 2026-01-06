@@ -17,7 +17,11 @@ const mAuth = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
     // Guardamos la info del usuario en la request
-    req.user = decoded
+    req.user = {
+      id: decoded.id,
+      username: decoded.username,
+      role: decoded.role,
+    }
 
     // Pasamos al siguiente middleware o controlador
     next() // Todo bien, seguimos adelante

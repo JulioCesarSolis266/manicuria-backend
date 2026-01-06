@@ -1,9 +1,14 @@
-import express from "express"
+import { Router } from "express"
 import cAuth from "../controllers/cAuth.js"
+import mAuth from "../middlewares/mAuth.js"
+import mRole from "../middlewares/mRole.js"
 
-const router = express.Router()
+const router = Router()
 
-router.post("/register", cAuth.register)
+// Solo el admin puede crear nuevas usuarias
+router.post("/register", mAuth, mRole("admin"), cAuth.register)
+
+// Cualquiera puede loguearse
 router.post("/login", cAuth.login)
 
 export default router

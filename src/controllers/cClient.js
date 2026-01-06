@@ -30,6 +30,7 @@ const cClient = {
   // Obtener todos los clientes
   getAll: async (req, res) => {
     try {
+      console.log("Usuario autenticado:", req.user);  // <---- AGREGAR
       const clients = await prisma.client.findMany({
         include: { appointments: true }
       })

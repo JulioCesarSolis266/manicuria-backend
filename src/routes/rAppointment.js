@@ -6,6 +6,7 @@ const router = express.Router()
 
 // 🔒 Todas las rutas protegidas
 router.get("/", mAuth, cAppointment.getAll)
+router.get("/:id", mAuth, cAppointment.getOne)
 router.post("/", mAuth, cAppointment.create)
 router.put("/:id", mAuth, cAppointment.update)
 router.delete("/:id", mAuth, cAppointment.delete)

@@ -8,7 +8,9 @@ import rAppointment from "./src/routes/rAppointment.js"
 import rUser from "./src/routes/rUser.js"
 import rClient from "./src/routes/rClient.js"
 import rAppointmentFilter from "./src/routes/rAppointmentFilter.js"
-import dashboardRoutes from "./src/routes/rDashboard.js"
+import rDashboard from "./src/routes/rDashboard.js"
+import rService from "./src/routes/rService.js"
+import rEmployee from "./src/routes/rEmployee.js"
 
 // Middleware de errores
 import mError from "./src/middlewares/mError.js"
@@ -27,7 +29,9 @@ app.use("/api/appointments", rAppointment)
 app.use("/api/users", rUser)
 app.use("/api/clients", rClient);
 app.use("/api/appointments/filter", rAppointmentFilter)
-app.use("/api/dashboard", dashboardRoutes)
+app.use("/api/dashboard", rDashboard)
+app.use("/api/services", rService)
+app.use("/api/employees", rEmployee)
 
 // Middleware para manejar rutas no encontradas
 app.use((req, res, next) => {

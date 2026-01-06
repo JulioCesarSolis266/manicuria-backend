@@ -1,13 +1,14 @@
-import express from "express"
+import { Router } from "express"
 import cUser from "../controllers/cUser.js"
 import mAuth from "../middlewares/mAuth.js"
+import mRole from "../middlewares/mRole.js"
 
-const router = express.Router()
+const router = Router()
 
-// 🔒 Todas las rutas protegidas
-router.get("/", mAuth, cUser.getAll)
-router.post("/", mAuth, cUser.create)
-router.put("/:id", mAuth, cUser.update)
-router.delete("/:id", mAuth, cUser.deactivate)
+// Todas requieren autenticación + rol admin
+router.get("/", mAuth, mRole("admin"), cUser.getAll)
+router.post("/", mAuth, mRole("admin"), cUser.create)
+router.put("/:id", mAuth, mRole("admin"), cUser.update)
+router.delete("/:id", mAuth, mRole("admin"), cUser.deactivate)
 
 export default router
