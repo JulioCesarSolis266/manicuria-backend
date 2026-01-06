@@ -29,6 +29,21 @@ model User {
 }
 
 
+// EMPLOYEES (Empleadas de la manicura)
+model Employee {
+  id          Int            @id @default(autoincrement())
+  userId      Int?           // opcional, por si más adelante deseas login
+
+  name        String
+  phone       String?
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+
+  // Relación con turnos asignados a esta empleada
+  appointments Appointment[] @relation("EmployeeAppointments")
+}
+
+
 // CLIENTS (Clientes finales)
 model Client {
   id            Int           @id @default(autoincrement())
@@ -41,12 +56,42 @@ model Client {
 }
 
 
+// SERVICES (Servicios ofrecidos)
+model Service {
+  id              Int          @id @default(autoincrement())
+  name            String
+  price           Float
+  durationMinutes Int          // duración del servicio
+  category        String?
+  description     String?
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+
+  appointments    Appointment[]
+}
+
+
 // APPOINTMENTS (Turnos)
 model Appointment {
-  id             Int        @id @default(autoincrement())
-  date           DateTime
-  status         String     @default("pending")
-  clientId       Int
-  client         Client     @relation(fields: [clientId], references: [id])
-  createdAt      DateTime   @default(now())
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  status      String   @default("pending")
+
+  // Cliente (obligatorio en ambas versiones)
+  clientId    Int
+  client      Client   @relation(fields: [clientId], references: [id])
+
+  // Servicio (solo en advanced)
+  serviceId   Int?
+  service     Service? @relation(fields: [serviceId], references: [id])
+
+  // Usuario que creó el turno (solo en rama advanced)
+  createdById Int?
+  createdBy   User?    @relation("AppointmentsCreated", fields: [createdById], references: [id])
+
+  // Empleada que atiende (solo en rama advanced)
+  employeeId  Int?
+  employee    Employee? @relation("EmployeeAppointments", fields: [employeeId], references: [id])
+
+  createdAt   DateTime @default(now())
 }
