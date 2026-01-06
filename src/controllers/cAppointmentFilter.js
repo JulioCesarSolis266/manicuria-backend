@@ -6,12 +6,11 @@ const prisma = new PrismaClient()
 const cAppointmentFilter = {
   filter: async (req, res) => {
     try {
-      const { status, employeeId, startDate, endDate } = req.query
+      const { status, startDate, endDate } = req.query
 
       const filters = {}
 
       if (status) filters.status = status
-      if (employeeId) filters.employeeId = parseInt(employeeId)
 
       if (startDate || endDate) {
         filters.date = {}
@@ -23,9 +22,7 @@ const cAppointmentFilter = {
         where: filters,
         include: {
           client: true,
-          service: true,
-          createdBy: { select: { id: true, username: true } },
-          employee: { select: { id: true, name: true } }
+          createdBy: { select: { id: true, username: true } }
         }
       })
 

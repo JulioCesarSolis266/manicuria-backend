@@ -8,24 +8,21 @@ const cAppointment = {
   // Crear una nueva cita
   create: async (req, res) => {
     try {
-      const { serviceId, date, clientId, employeeId } = req.body
+      const { date, clientId} = req.body
 
       const clientIdNumber = parseInt(clientId)
-      const employeeIdNumber = employeeId ? parseInt(employeeId) : null
 
-      if (!serviceId || !date || !clientIdNumber) {
-        return mError.e400(res, "Los campos serviceId, date y clientId son obligatorios")
+      if (!date || !clientIdNumber) {
+        return mError.e400(res, "Los campos date y clientId son obligatorios")
       }
 
       const createdById = req.user.id
-      const assignedEmployee = employeeIdNumber || createdById
       const dateObj = new Date(date)
 
       // Validar conflicto de horarios
       const existing = await prisma.appointment.findFirst({
         where: {
-          date: dateObj,
-          employeeId: assignedEmployee
+          date: dateObj
         }
       })
 
@@ -36,17 +33,13 @@ const cAppointment = {
       // Crear turno
       const newAppointment = await prisma.appointment.create({
         data: {
-          serviceId: parseInt(serviceId),
           date: dateObj,
           clientId: clientIdNumber,
-          createdById,
-          employeeId: employeeIdNumber
+          createdById
         },
         include: {
           client: true,
-          service: true,
-          createdBy: { select: { id: true, username: true } },
-          employee: { select: { id: true, name: true } }
+          createdBy: { select: { id: true, username: true } }
         }
       })
 
@@ -67,9 +60,7 @@ const cAppointment = {
       const appointments = await prisma.appointment.findMany({
         include: {
           client: true,
-          service: true,
-          createdBy: { select: { id: true, username: true } },
-          employee: { select: { id: true, name: true } }
+          createdBy: { select: { id: true, username: true } }
         }
       })
 
@@ -97,9 +88,7 @@ const cAppointment = {
         where: { id: parseInt(id) },
         include: {
           client: true,
-          service: true,
-          createdBy: { select: { id: true, username: true } },
-          employee: { select: { id: true, name: true } }
+          createdBy: { select: { id: true, username: true } }
         }
       })
 
@@ -119,7 +108,7 @@ const cAppointment = {
   update: async (req, res) => {
     try {
       const { id } = req.params
-      const { serviceId, date, clientId, employeeId, status } = req.body
+      const { date, clientId, status } = req.body
 
       const appointmentId = parseInt(id)
 
@@ -131,20 +120,13 @@ const cAppointment = {
         return mError.e404(res, "No se encontró la cita")
       }
 
-      const employeeIdNumber = employeeId ? parseInt(employeeId) : null
       const newDate = date ? new Date(date) : existingAppointment.date
-
-      const finalEmployeeId =
-        employeeIdNumber ||
-        existingAppointment.employeeId ||
-        existingAppointment.createdById
 
       // Validación conflicto
       const conflict = await prisma.appointment.findFirst({
         where: {
           id: { not: appointmentId },
-          date: newDate,
-          employeeId: finalEmployeeId
+          date: newDate
         }
       })
 
@@ -155,17 +137,13 @@ const cAppointment = {
       const updatedAppointment = await prisma.appointment.update({
         where: { id: appointmentId },
         data: {
-          serviceId: serviceId ? parseInt(serviceId) : undefined,
           date: date ? newDate : undefined,
           clientId: clientId ? parseInt(clientId) : undefined,
-          employeeId: employeeIdNumber ?? existingAppointment.employeeId,
           status: status ?? existingAppointment.status
         },
         include: {
           client: true,
-          service: true,
-          createdBy: { select: { id: true, username: true } },
-          employee: { select: { id: true, name: true } }
+          createdBy: { select: { id: true, username: true } }
         }
       })
 
