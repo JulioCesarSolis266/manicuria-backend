@@ -5,30 +5,48 @@ const prisma = new PrismaClient()
 
 const cAppointment = {
 
-  // Crear una nueva cita (MVP)
+  // Crear una nueva cita
   create: async (req, res) => {
     try {
-      const { date, clientId } = req.body
+      const { serviceId, date, clientId, employeeId } = req.body
 
       const clientIdNumber = parseInt(clientId)
+      const employeeIdNumber = employeeId ? parseInt(employeeId) : null
 
-      if (!date || !clientIdNumber) {
-        return mError.e400(res, "Los campos date y clientId son obligatorios")
+      if (!serviceId || !date || !clientIdNumber) {
+        return mError.e400(res, "Los campos serviceId, date y clientId son obligatorios")
       }
 
       const createdById = req.user.id
+      const assignedEmployee = employeeIdNumber || createdById
       const dateObj = new Date(date)
 
-      // Crear turno sin servicio ni empleada
+      // Validar conflicto de horarios
+      const existing = await prisma.appointment.findFirst({
+        where: {
+          date: dateObj,
+          employeeId: assignedEmployee
+        }
+      })
+
+      if (existing) {
+        return mError.e400(res, "Ya existe un turno en esa fecha y hora con la misma manicura.")
+      }
+
+      // Crear turno
       const newAppointment = await prisma.appointment.create({
         data: {
+          serviceId: parseInt(serviceId),
           date: dateObj,
           clientId: clientIdNumber,
-          createdById
+          createdById,
+          employeeId: employeeIdNumber
         },
         include: {
           client: true,
-          createdBy: { select: { id: true, username: true } }
+          service: true,
+          createdBy: { select: { id: true, username: true } },
+          employee: { select: { id: true, name: true } }
         }
       })
 
@@ -42,15 +60,25 @@ const cAppointment = {
     }
   },
 
+
   // Obtener todas las citas
   getAll: async (req, res) => {
     try {
       const appointments = await prisma.appointment.findMany({
         include: {
           client: true,
-          createdBy: { select: { id: true, username: true } }
+          service: true,
+          createdBy: { select: { id: true, username: true } },
+          employee: { select: { id: true, name: true } }
         }
       })
+
+      if (appointments.length === 0) {
+        return res.status(200).json({
+          appointments: [],
+          message: "No hay citas registradas"
+        })
+      }
 
       res.status(200).json({ appointments })
 
@@ -58,6 +86,7 @@ const cAppointment = {
       mError.e500(res, "Error al obtener las citas", error)
     }
   },
+
 
   // Obtener cita por ID
   getOne: async (req, res) => {
@@ -68,7 +97,9 @@ const cAppointment = {
         where: { id: parseInt(id) },
         include: {
           client: true,
-          createdBy: { select: { id: true, username: true } }
+          service: true,
+          createdBy: { select: { id: true, username: true } },
+          employee: { select: { id: true, name: true } }
         }
       })
 
@@ -83,11 +114,12 @@ const cAppointment = {
     }
   },
 
+
   // Actualizar cita
   update: async (req, res) => {
     try {
       const { id } = req.params
-      const { date, clientId, status } = req.body
+      const { serviceId, date, clientId, employeeId, status } = req.body
 
       const appointmentId = parseInt(id)
 
@@ -99,18 +131,41 @@ const cAppointment = {
         return mError.e404(res, "No se encontró la cita")
       }
 
+      const employeeIdNumber = employeeId ? parseInt(employeeId) : null
       const newDate = date ? new Date(date) : existingAppointment.date
+
+      const finalEmployeeId =
+        employeeIdNumber ||
+        existingAppointment.employeeId ||
+        existingAppointment.createdById
+
+      // Validación conflicto
+      const conflict = await prisma.appointment.findFirst({
+        where: {
+          id: { not: appointmentId },
+          date: newDate,
+          employeeId: finalEmployeeId
+        }
+      })
+
+      if (conflict) {
+        return mError.e400(res, "Ya existe otra cita en esa fecha y hora para esa manicura.")
+      }
 
       const updatedAppointment = await prisma.appointment.update({
         where: { id: appointmentId },
         data: {
+          serviceId: serviceId ? parseInt(serviceId) : undefined,
           date: date ? newDate : undefined,
           clientId: clientId ? parseInt(clientId) : undefined,
+          employeeId: employeeIdNumber ?? existingAppointment.employeeId,
           status: status ?? existingAppointment.status
         },
         include: {
           client: true,
-          createdBy: { select: { id: true, username: true } }
+          service: true,
+          createdBy: { select: { id: true, username: true } },
+          employee: { select: { id: true, name: true } }
         }
       })
 
@@ -123,6 +178,7 @@ const cAppointment = {
       mError.e500(res, "Error al actualizar la cita", error)
     }
   },
+
 
   // Eliminar cita
   delete: async (req, res) => {
