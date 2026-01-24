@@ -8,6 +8,7 @@ const router = Router()
 // Todas requieren autenticación + rol admin
 router.get("/", mAuth, mRole("admin"), cUser.getAll)
 router.post("/", mAuth, mRole("admin"), cUser.create)
+router.patch("/:id/reactivate", cUser.reactivate);
 router.put("/:id", mAuth, mRole("admin"), cUser.update)
 router.delete("/:id", mAuth, mRole("admin"), cUser.deactivate)
 

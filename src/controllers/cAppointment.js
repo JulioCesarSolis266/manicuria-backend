@@ -8,7 +8,7 @@ const cAppointment = {
   // Crear una nueva cita
   create: async (req, res) => {
     try {
-      const { serviceId, date, clientId, employeeId } = req.body
+      const { serviceId, date, clientId, employeeId, description } = req.body
 
       const clientIdNumber = parseInt(clientId)
       const employeeIdNumber = employeeId ? parseInt(employeeId) : null
@@ -17,15 +17,15 @@ const cAppointment = {
         return mError.e400(res, "Los campos serviceId, date y clientId son obligatorios")
       }
 
-      const createdById = req.user.id
-      const assignedEmployee = employeeIdNumber || createdById
+      const userId = req.user.id   // 👈 Dueña del turno (manicura)
       const dateObj = new Date(date)
 
-      // Validar conflicto de horarios
+      // Validar conflicto de horarios (misma empleada en misma fecha/hora)
       const existing = await prisma.appointment.findFirst({
         where: {
           date: dateObj,
-          employeeId: assignedEmployee
+          employeeId: employeeIdNumber,
+          userId: userId   // 👈 Solo dentro de la misma manicura
         }
       })
 
@@ -39,13 +39,13 @@ const cAppointment = {
           serviceId: parseInt(serviceId),
           date: dateObj,
           clientId: clientIdNumber,
-          createdById,
-          employeeId: employeeIdNumber
+          userId,
+          employeeId: employeeIdNumber,
+          description: description || null
         },
         include: {
           client: true,
           service: true,
-          createdBy: { select: { id: true, username: true } },
           employee: { select: { id: true, name: true } }
         }
       })
@@ -64,13 +64,21 @@ const cAppointment = {
   // Obtener todas las citas
   getAll: async (req, res) => {
     try {
+      let where = {}
+
+      // Si no es admin, solo ver sus propias citas
+      if (req.user.role !== "admin") {
+        where.userId = req.user.id
+      }
+
       const appointments = await prisma.appointment.findMany({
+        where,
         include: {
           client: true,
           service: true,
-          createdBy: { select: { id: true, username: true } },
           employee: { select: { id: true, name: true } }
-        }
+        },
+        orderBy: { date: "desc" }
       })
 
       if (appointments.length === 0) {
@@ -92,19 +100,24 @@ const cAppointment = {
   getOne: async (req, res) => {
     try {
       const { id } = req.params
+      const appointmentId = parseInt(id)
 
       const appointment = await prisma.appointment.findUnique({
-        where: { id: parseInt(id) },
+        where: { id: appointmentId },
         include: {
           client: true,
           service: true,
-          createdBy: { select: { id: true, username: true } },
           employee: { select: { id: true, name: true } }
         }
       })
 
       if (!appointment) {
         return mError.e404(res, "No se encontró la cita")
+      }
+
+      // Seguridad: si no es admin, verificar que sea de su propiedad
+      if (req.user.role !== "admin" && appointment.userId !== req.user.id) {
+        return mError.e403(res, "No tenés permiso para ver esta cita")
       }
 
       res.status(200).json(appointment)
@@ -119,7 +132,7 @@ const cAppointment = {
   update: async (req, res) => {
     try {
       const { id } = req.params
-      const { serviceId, date, clientId, employeeId, status } = req.body
+      const { serviceId, date, clientId, employeeId, status, description } = req.body
 
       const appointmentId = parseInt(id)
 
@@ -131,20 +144,21 @@ const cAppointment = {
         return mError.e404(res, "No se encontró la cita")
       }
 
+      // Seguridad: si no es admin, solo puede modificar sus citas
+      if (req.user.role !== "admin" && existingAppointment.userId !== req.user.id) {
+        return mError.e403(res, "No tenés permiso para modificar esta cita")
+      }
+
       const employeeIdNumber = employeeId ? parseInt(employeeId) : null
       const newDate = date ? new Date(date) : existingAppointment.date
 
-      const finalEmployeeId =
-        employeeIdNumber ||
-        existingAppointment.employeeId ||
-        existingAppointment.createdById
-
-      // Validación conflicto
+      // Validación de conflicto (misma empleada, mismo horario, misma manicura)
       const conflict = await prisma.appointment.findFirst({
         where: {
           id: { not: appointmentId },
           date: newDate,
-          employeeId: finalEmployeeId
+          employeeId: employeeIdNumber ?? existingAppointment.employeeId,
+          userId: existingAppointment.userId
         }
       })
 
@@ -159,12 +173,12 @@ const cAppointment = {
           date: date ? newDate : undefined,
           clientId: clientId ? parseInt(clientId) : undefined,
           employeeId: employeeIdNumber ?? existingAppointment.employeeId,
-          status: status ?? existingAppointment.status
+          status: status ?? existingAppointment.status,
+          description: description ?? existingAppointment.description
         },
         include: {
           client: true,
           service: true,
-          createdBy: { select: { id: true, username: true } },
           employee: { select: { id: true, name: true } }
         }
       })
@@ -184,9 +198,23 @@ const cAppointment = {
   delete: async (req, res) => {
     try {
       const { id } = req.params
+      const appointmentId = parseInt(id)
+
+      const appointment = await prisma.appointment.findUnique({
+        where: { id: appointmentId }
+      })
+
+      if (!appointment) {
+        return mError.e404(res, "No se encontró la cita")
+      }
+
+      // Seguridad: si no es admin, solo puede borrar sus citas
+      if (req.user.role !== "admin" && appointment.userId !== req.user.id) {
+        return mError.e403(res, "No tenés permiso para eliminar esta cita")
+      }
 
       await prisma.appointment.delete({
-        where: { id: parseInt(id) }
+        where: { id: appointmentId }
       })
 
       res.status(200).json({ message: "Cita eliminada" })
