@@ -155,6 +155,27 @@ const cUser = {
       mError.e500(res, "Error al reactivar usuario", error)
     }
   },
+
+  // 🔴 Eliminar usuario definitivamente
+delete: async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+    })
+
+    if (!user) return mError.e404(res, "Usuario no encontrado")
+
+    await prisma.user.delete({
+      where: { id: Number(id) },
+    })
+
+    res.status(200).json({ message: "Usuario eliminado definitivamente" })
+  } catch (error) {
+    mError.e500(res, "Error al eliminar usuario", error)
+  }
+},
 }
 
 export default cUser
