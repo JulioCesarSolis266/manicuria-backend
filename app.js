@@ -21,6 +21,7 @@ const app = express()
 // Middleware global
 app.use(cors())
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 
 // Rutas públicas y protegidas
 app.use("/api/auth", rAuth)
