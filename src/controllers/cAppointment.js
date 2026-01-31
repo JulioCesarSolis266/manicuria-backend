@@ -195,19 +195,18 @@ const cAppointment = {
       }
 
       const now = new Date();
-      const appointmentDate = existingAppointment.date;
-      const isPast = appointmentDate < now;
+      const isPast = existingAppointment.date < now;
 
-      const newDate = date ? new Date(date) : appointmentDate;
+      const newDate = date ? new Date(date) : existingAppointment.date;
 
       // -------------------------
-      // Validar fecha enviada
+      // Validar fecha si se envía
       // -------------------------
       if (date && isNaN(newDate.getTime())) {
         return mError.e400(res, "La fecha es inválida");
       }
 
-      // Nunca permitir mover al pasado
+      // ❌ Nunca permitir mover al pasado
       if (date && newDate < now) {
         return mError.e400(res, "No se puede mover el turno al pasado");
       }
@@ -216,21 +215,24 @@ const cAppointment = {
       // 🔒 REGLAS PARA TURNOS PASADOS
       // -------------------------
       if (isPast) {
-        // No se puede cambiar el cliente
+        // ❌ No se puede cambiar el cliente
         if (clientId && parseInt(clientId) !== existingAppointment.clientId) {
           return mError.e400(
             res,
-            "No se puede cambiar el cliente de un turno pasado. Debe crearse uno nuevo.",
+            "No se puede cambiar el cliente de un turno pasado. Creá uno nuevo.",
           );
         }
 
-        // Si no se reprograma (no cambia fecha), solo puede cerrarse
-        if (!date && status && !["completed", "cancelled"].includes(status)) {
+        // ❌ No permitir volver a pending
+        if (status === "pending") {
           return mError.e400(
             res,
-            "Un turno pasado solo puede marcarse como completado o cancelado",
+            "Un turno pasado no puede volver a estado pendiente",
           );
         }
+
+        // ✅ Permitir cambiar a completed o cancelled (aunque no se cambie fecha)
+        // No hace falta validación extra acá
       }
 
       // -------------------------
@@ -254,7 +256,12 @@ const cAppointment = {
         where: { id: appointmentId },
         data: {
           serviceId: serviceId ? parseInt(serviceId) : undefined,
-          clientId: clientId ? parseInt(clientId) : undefined,
+          // cliente solo si NO es pasado
+          clientId: isPast
+            ? undefined
+            : clientId
+              ? parseInt(clientId)
+              : undefined,
           date: date ? newDate : undefined,
           status: status ?? undefined,
           description: description ?? undefined,
