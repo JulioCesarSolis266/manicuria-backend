@@ -1,17 +1,16 @@
-import { PrismaClient } from "@prisma/client"
-import mError from "../middlewares/mError.js"
+import { PrismaClient } from "@prisma/client";
+import mError from "../middlewares/mError.js";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const cAppointment = {
-
   // =========================
   // Crear una nueva cita
   // =========================
   create: async (req, res) => {
     try {
-      const { serviceId, date, clientId, description } = req.body
-      const userId = req.user.id
+      const { serviceId, date, clientId, description } = req.body;
+      const userId = req.user.id;
 
       // -------------------------
       // Validaciones básicas
@@ -19,28 +18,28 @@ const cAppointment = {
       if (!serviceId || !clientId || !date) {
         return mError.e400(
           res,
-          "Los campos serviceId, clientId y date son obligatorios"
-        )
+          "Los campos serviceId, clientId y date son obligatorios",
+        );
       }
 
-      const serviceIdNumber = parseInt(serviceId)
-      const clientIdNumber = parseInt(clientId)
+      const serviceIdNumber = parseInt(serviceId);
+      const clientIdNumber = parseInt(clientId);
 
       if (isNaN(serviceIdNumber) || isNaN(clientIdNumber)) {
-        return mError.e400(res, "serviceId y clientId deben ser numéricos")
+        return mError.e400(res, "serviceId y clientId deben ser numéricos");
       }
 
       // -------------------------
       // Validación de fecha
       // -------------------------
-      const dateObj = new Date(date)
+      const dateObj = new Date(date);
 
       if (isNaN(dateObj.getTime())) {
-        return mError.e400(res, "La fecha es inválida")
+        return mError.e400(res, "La fecha es inválida");
       }
 
       if (dateObj < new Date()) {
-        return mError.e400(res, "No se pueden crear turnos en el pasado")
+        return mError.e400(res, "No se pueden crear turnos en el pasado");
       }
 
       // -------------------------
@@ -49,15 +48,15 @@ const cAppointment = {
       const clientExists = await prisma.client.findFirst({
         where: {
           id: clientIdNumber,
-          userId
-        }
-      })
+          userId,
+        },
+      });
 
       if (!clientExists) {
         return mError.e400(
           res,
-          "El cliente no existe o no pertenece al usuario"
-        )
+          "El cliente no existe o no pertenece al usuario",
+        );
       }
 
       // -------------------------
@@ -66,15 +65,15 @@ const cAppointment = {
       const serviceExists = await prisma.service.findFirst({
         where: {
           id: serviceIdNumber,
-          userId
-        }
-      })
+          userId,
+        },
+      });
 
       if (!serviceExists) {
         return mError.e400(
           res,
-          "El servicio no existe o no pertenece al usuario"
-        )
+          "El servicio no existe o no pertenece al usuario",
+        );
       }
 
       // -------------------------
@@ -83,15 +82,12 @@ const cAppointment = {
       const existingAppointment = await prisma.appointment.findFirst({
         where: {
           date: dateObj,
-          userId
-        }
-      })
+          userId,
+        },
+      });
 
       if (existingAppointment) {
-        return mError.e400(
-          res,
-          "Ya existe un turno en esa fecha y hora"
-        )
+        return mError.e400(res, "Ya existe un turno en esa fecha y hora");
       }
 
       // -------------------------
@@ -103,21 +99,20 @@ const cAppointment = {
           clientId: clientIdNumber,
           date: dateObj,
           description: description || null,
-          userId
+          userId,
         },
         include: {
           client: true,
-          service: true
-        }
-      })
+          service: true,
+        },
+      });
 
       res.status(201).json({
         message: "Cita creada correctamente",
-        appointment: newAppointment
-      })
-
+        appointment: newAppointment,
+      });
     } catch (error) {
-      mError.e500(res, "Error al crear la cita", error)
+      mError.e500(res, "Error al crear la cita", error);
     }
   },
 
@@ -126,25 +121,24 @@ const cAppointment = {
   // =========================
   getAll: async (req, res) => {
     try {
-      let where = {}
+      let where = {};
 
       if (req.user.role !== "admin") {
-        where.userId = req.user.id
+        where.userId = req.user.id;
       }
 
       const appointments = await prisma.appointment.findMany({
         where,
         include: {
           client: true,
-          service: true
+          service: true,
         },
-        orderBy: { date: "desc" }
-      })
+        orderBy: { date: "desc" },
+      });
 
-      res.status(200).json({ appointments })
-
+      res.status(200).json({ appointments });
     } catch (error) {
-      mError.e500(res, "Error al obtener las citas", error)
+      mError.e500(res, "Error al obtener las citas", error);
     }
   },
 
@@ -153,34 +147,27 @@ const cAppointment = {
   // =========================
   getOne: async (req, res) => {
     try {
-      const appointmentId = parseInt(req.params.id)
+      const appointmentId = parseInt(req.params.id);
 
       const appointment = await prisma.appointment.findUnique({
         where: { id: appointmentId },
         include: {
           client: true,
-          service: true
-        }
-      })
+          service: true,
+        },
+      });
 
       if (!appointment) {
-        return mError.e404(res, "No se encontró la cita")
+        return mError.e404(res, "No se encontró la cita");
       }
 
-      if (
-        req.user.role !== "admin" &&
-        appointment.userId !== req.user.id
-      ) {
-        return mError.e403(
-          res,
-          "No tenés permiso para ver esta cita"
-        )
+      if (req.user.role !== "admin" && appointment.userId !== req.user.id) {
+        return mError.e403(res, "No tenés permiso para ver esta cita");
       }
 
-      res.status(200).json(appointment)
-
+      res.status(200).json(appointment);
     } catch (error) {
-      mError.e500(res, "Error al obtener la cita", error)
+      mError.e500(res, "Error al obtener la cita", error);
     }
   },
 
@@ -189,53 +176,77 @@ const cAppointment = {
   // =========================
   update: async (req, res) => {
     try {
-      const appointmentId = parseInt(req.params.id)
-      const { serviceId, date, clientId, status, description } = req.body
+      const appointmentId = parseInt(req.params.id);
+      const { serviceId, date, clientId, status, description } = req.body;
 
       const existingAppointment = await prisma.appointment.findUnique({
-        where: { id: appointmentId }
-      })
+        where: { id: appointmentId },
+      });
 
       if (!existingAppointment) {
-        return mError.e404(res, "No se encontró la cita")
+        return mError.e404(res, "No se encontró la cita");
       }
 
       if (
         req.user.role !== "admin" &&
         existingAppointment.userId !== req.user.id
       ) {
-        return mError.e403(
-          res,
-          "No tenés permiso para modificar esta cita"
-        )
+        return mError.e403(res, "No tenés permiso para modificar esta cita");
       }
 
-      const newDate = date ? new Date(date) : existingAppointment.date
+      const now = new Date();
+      const appointmentDate = existingAppointment.date;
+      const isPast = appointmentDate < now;
 
-      // Validar fecha si se envía
+      const newDate = date ? new Date(date) : appointmentDate;
+
+      // -------------------------
+      // Validar fecha enviada
+      // -------------------------
       if (date && isNaN(newDate.getTime())) {
-        return mError.e400(res, "La fecha es inválida")
+        return mError.e400(res, "La fecha es inválida");
       }
 
-      if (date && newDate < new Date()) {
-        return mError.e400(res, "No se puede mover el turno al pasado")
+      // Nunca permitir mover al pasado
+      if (date && newDate < now) {
+        return mError.e400(res, "No se puede mover el turno al pasado");
       }
 
+      // -------------------------
+      // 🔒 REGLAS PARA TURNOS PASADOS
+      // -------------------------
+      if (isPast) {
+        // No se puede cambiar el cliente
+        if (clientId && parseInt(clientId) !== existingAppointment.clientId) {
+          return mError.e400(
+            res,
+            "No se puede cambiar el cliente de un turno pasado. Debe crearse uno nuevo.",
+          );
+        }
+
+        // Si no se reprograma (no cambia fecha), solo puede cerrarse
+        if (!date && status && !["completed", "cancelled"].includes(status)) {
+          return mError.e400(
+            res,
+            "Un turno pasado solo puede marcarse como completado o cancelado",
+          );
+        }
+      }
+
+      // -------------------------
       // Validar conflicto si cambia la fecha
+      // -------------------------
       if (date) {
         const conflict = await prisma.appointment.findFirst({
           where: {
             id: { not: appointmentId },
             date: newDate,
-            userId: existingAppointment.userId
-          }
-        })
+            userId: existingAppointment.userId,
+          },
+        });
 
         if (conflict) {
-          return mError.e400(
-            res,
-            "Ya existe otro turno en esa fecha y hora"
-          )
+          return mError.e400(res, "Ya existe otro turno en esa fecha y hora");
         }
       }
 
@@ -246,21 +257,20 @@ const cAppointment = {
           clientId: clientId ? parseInt(clientId) : undefined,
           date: date ? newDate : undefined,
           status: status ?? undefined,
-          description: description ?? undefined
+          description: description ?? undefined,
         },
         include: {
           client: true,
-          service: true
-        }
-      })
+          service: true,
+        },
+      });
 
       res.status(200).json({
         message: "Cita actualizada correctamente",
-        appointment: updatedAppointment
-      })
-
+        appointment: updatedAppointment,
+      });
     } catch (error) {
-      mError.e500(res, "Error al actualizar la cita", error)
+      mError.e500(res, "Error al actualizar la cita", error);
     }
   },
 
@@ -269,36 +279,29 @@ const cAppointment = {
   // =========================
   delete: async (req, res) => {
     try {
-      const appointmentId = parseInt(req.params.id)
+      const appointmentId = parseInt(req.params.id);
 
       const appointment = await prisma.appointment.findUnique({
-        where: { id: appointmentId }
-      })
+        where: { id: appointmentId },
+      });
 
       if (!appointment) {
-        return mError.e404(res, "No se encontró la cita")
+        return mError.e404(res, "No se encontró la cita");
       }
 
-      if (
-        req.user.role !== "admin" &&
-        appointment.userId !== req.user.id
-      ) {
-        return mError.e403(
-          res,
-          "No tenés permiso para eliminar esta cita"
-        )
+      if (req.user.role !== "admin" && appointment.userId !== req.user.id) {
+        return mError.e403(res, "No tenés permiso para eliminar esta cita");
       }
 
       await prisma.appointment.delete({
-        where: { id: appointmentId }
-      })
+        where: { id: appointmentId },
+      });
 
-      res.status(200).json({ message: "Cita eliminada correctamente" })
-
+      res.status(200).json({ message: "Cita eliminada correctamente" });
     } catch (error) {
-      mError.e500(res, "Error al eliminar la cita", error)
+      mError.e500(res, "Error al eliminar la cita", error);
     }
-  }
-}
+  },
+};
 
-export default cAppointment
+export default cAppointment;
