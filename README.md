@@ -31,11 +31,12 @@ backend/
     └── schema.prisma 
  
  ├── src/
-    ├── controllers/
+    
+    └── controllers/
  
- │    ├── middlewares/
+    └── middlewares/
  
- │    ├── routes/
+    └── routes/
  
  ├── app.js
  
