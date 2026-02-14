@@ -8,37 +8,62 @@ El sistema implementa autenticación basada en JWT, control de acceso por roles 
 🏗️ Arquitectura
 
 Node.js
+
 Express.js (API REST)
+
 PostgreSQL
+
 Prisma ORM
+
 JWT Authentication
+
 Bcrypt para hash de contraseñas
+
 Arquitectura modular basada en separación de responsabilidades
 
+
 Estructura General
+
 backend/
+
  ├── prisma/
+
  │    └── schema.prisma
+ 
  ├── src/
+ 
  │    ├── controllers/
+ 
  │    ├── middlewares/
+ 
  │    ├── routes/
+ 
  ├── app.js
+ 
  └── .env
 
 🔐 Autenticación y Autorización
+
 Autenticación:
+
 Implementada con JWT
+
 Token enviado en headers (Authorization: Bearer token)
+
 Passwords hasheados con Bcrypt
 
 Autorización por Roles:
+
 Role: ADMIN
+
 Role: USER
 
 Middlewares personalizados:
+
 mAuth → verifica token
+
 mError → manejo centralizado de errores
+
 mRole → restringe acceso por rol
 
 
@@ -49,17 +74,25 @@ El backend concentra las reglas críticas del sistema:
 Validaciones implementadas
 
 No se permiten turnos en fechas pasadas
+
 No se permiten turnos duplicados (misma fecha y hora)
+
 No se pueden crear turnos sin:
+
 - Cliente existente
+
 - Servicio existente
+
 Integridad relacional garantizada vía Prisma
+
 Control de aislamiento entre negocios
 
 📦 Endpoints Principales
 
 Auth
+
 POST /auth/register (Admin)
+
 POST /auth/login
 
 Users (Admin)
