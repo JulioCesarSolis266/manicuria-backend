@@ -57,68 +57,107 @@ Integridad relacional garantizada vía Prisma
 Control de aislamiento entre negocios
 
 📦 Endpoints Principales
+
 Auth
 POST /auth/register (Admin)
 POST /auth/login
 
 Users (Admin)
+
 POST /users
+
 PUT /users/:id
+
 PATCH /users/:id/activate
+
 PATCH /users/:id/deactivate
+
 DELETE users/:id
 
 Clients
+
 GET /clients
+
 POST /clients
+
 PUT /clients/:id
+
 DELETE /clients/:id
 
 Services
+
 GET /services
+
 POST /services
+
 PUT /services/:id
+
 DELETE /services/:id
 
 Appointments
+
 GET /appointments
+
 POST /appointments
+
 PUT /appointments/:id
+
 DELETE /appointments/:id
 
 🗄️ Modelo de Datos (Simplificado)
+
 Entidades principales:
+
 User
+
 Client
+
 Service
+
 Appointment
 
 Relaciones:
+
 Un Admin tiene muchos Users
+
 Un User tiene muchos Clients
+
 Un User tiene muchos Services
+
 Un User tiene muchos Appointments
+
 Un Appointment pertenece a un Client
+
 Un Appointment pertenece a un Service
 
 🌐 Entorno y Configuración
+
 Variables de entorno requeridas
+
 DATABASE_URL=
+
 JWT_SECRET=
+
 PORT=
 
 ⚙️ Instalación Local
+
 git clone <https://github.com/JulioCesarSolis266/manicuria-backend>
+
 cd backend
+
 npm install
 
 Configurar archivo .env
 
 npx prisma migrate dev
+
 npm run dev
 
 🚀 Deploy
+
 Backend: Render
+
 Base de datos: PostgreSQL (producción)
 
 🔍 Decisiones Técnicas Relevantes
@@ -130,8 +169,13 @@ Migración desde entorno local inicial con xampp hacia PostgreSQL con Prisma par
 Estructura preparada para evolución hacia arquitectura más robusta (ej: TypeScript).
 
 🔮 Próximas Mejoras
+
 Migración a TypeScript
+
 Soporte para múltiples empleados por usuario.
+
 Permitir turnos simultáneos según recurso(employees)
+
 Implementación de métricas y reportes
+
 Mejora en modularización de servicios
