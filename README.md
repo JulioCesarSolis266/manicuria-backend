@@ -31,8 +31,7 @@ backend/
     └── schema.prisma 
  
  ├── src/
- 
- │    ├── controllers/
+    ├── controllers/
  
  │    ├── middlewares/
  
