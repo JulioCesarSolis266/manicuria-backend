@@ -27,8 +27,9 @@ Estructura General
 backend/
 
  ├── prisma/
-
- │    └── schema.prisma
+    └── schema.prisma
+    
+ │   
  
  ├── src/
  
