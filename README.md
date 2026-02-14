@@ -212,3 +212,5 @@ Permitir turnos simultáneos según recurso(employees)
 Implementación de métricas y reportes
 
 Mejora en modularización de servicios
+
+Repositorio del frontend <https://github.com/JulioCesarSolis266/manicuria-frontend>
