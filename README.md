@@ -21,26 +21,33 @@ Bcrypt para hash de contraseñas
 
 Arquitectura modular basada en separación de responsabilidades
 
-
 Estructura General
 
 backend/
 
- ├── prisma/
-    
-    └── schema.prisma 
- 
- ├── src/
-    
-    └── controllers/
- 
+├── prisma/
+
+    └── schema.prisma
+
+├── src/
+
     └── middlewares/
- 
-    ├── routes/
- 
- ├── app.js
- 
- └── .env
+
+    ├── modules/
+         └──appointment
+         |   └──cAppointment.js
+         |  ├──rAppointment.js
+         |  └──sAppointment.js
+         └──apoointmentFilters
+         ├──auth
+         ├──client
+         ├──dashboard
+         ├──service
+         └──user
+
+├── app.js
+
+└── .env
 
 🔐 Autenticación y Autorización
 
@@ -65,7 +72,6 @@ mAuth → verifica token
 mError → manejo centralizado de errores
 
 mRole → restringe acceso por rol
-
 
 🧠 Lógica de Negocio
 
