@@ -38,7 +38,7 @@ backend/
          |   └──cAppointment.js
          |  ├──rAppointment.js
          |  └──sAppointment.js
-         └──apoointmentFilters
+         └──appointmentFilters
          ├──auth
          ├──client
          ├──dashboard
