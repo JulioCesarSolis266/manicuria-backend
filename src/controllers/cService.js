@@ -72,7 +72,7 @@ const cService = {
   getAll: async (req, res) => {
     try {
       const includeInactive = req.query.all === "true";
-      const userId = req.user.id;
+      const userId = req.user.id; 
 
       const services = await prisma.service.findMany({
         where: {
