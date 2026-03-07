@@ -1,6 +1,6 @@
 import express from "express";
-import cClient from "../controllers/cClient.js";
-import mAuth from "../middlewares/mAuth.js";
+import cClient from "./cClient.js";
+import mAuth from "../../middlewares/mAuth.js";
 
 const router = express.Router();
 
