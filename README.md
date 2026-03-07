@@ -23,31 +23,25 @@ Arquitectura modular basada en separación de responsabilidades
 
 Estructura General
 
-backend/
-
-├── prisma/
-
-    └── schema.prisma
-
-├── src/
-
-    └── middlewares/
-
-    ├── modules/
-         └──appointment
-         |   └──cAppointment.js
-         |  ├──rAppointment.js
-         |  └──sAppointment.js
-         └──appointmentFilters
-         ├──auth
-         ├──client
-         ├──dashboard
-         ├──service
-         └──user
-
-├── app.js
-
-└── .env
+```
+prisma/
+src/
+├── middlewares/
+│   ├── mAuthjs
+│   ├── mError.js
+│   └── mRole.js
+└── modules/
+    └──appointment
+     |   └──cAppointment.js
+     |  ├──rAppointment.js
+     |  └──sAppointment.js
+     └──appointmentFilters
+     ├──auth
+     ├──client
+     ├──dashboard
+     ├──service
+     └──user
+```
 
 🔐 Autenticación y Autorización
 
