@@ -31,16 +31,17 @@ src/
 │   ├── mError.js
 │   └── mRole.js
 └── modules/
-    └──appointment
-     |   └──cAppointment.js
-     |  ├──rAppointment.js
-     |  └──sAppointment.js
-     └──appointmentFilters
-     ├──auth
-     ├──client
-     ├──dashboard
-     ├──service
-     └──user
+|    └──appointment
+|     |   └──cAppointment.js
+|     |  ├──rAppointment.js
+|     |  └──sAppointment.js
+|     └──appointmentFilters
+|     ├──auth
+|     ├──client
+|     ├──dashboard
+|     ├──service
+|     └──user
+└── app.js
 ```
 
 🔐 Autenticación y Autorización
