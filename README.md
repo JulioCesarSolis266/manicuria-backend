@@ -214,4 +214,20 @@ Implementación de métricas y reportes
 
 Mejora en modularización de servicios
 
+API Documentation
+
+Interactive API documentation is available using Swagger.
+
+Swagger configuration is located in the src/docs directory:
+
+swagger.js – Main Swagger configuration
+
+swagger.paths.js – API route definitions
+
+swagger.schemas.js – Data schemas
+
+Once the server is running, access the documentation at:
+
+http://localhost:PORT/api-docs
+
 Repositorio del frontend <https://github.com/JulioCesarSolis266/manicuria-frontend>
