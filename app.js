@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors"; // CORS es un middleware que permite controlar qué dominios pueden acceder a tu API. En desarrollo, puedes usar cors() sin argumentos para permitir todas las solicitudes, pero en producción es recomendable configurar los orígenes permitidos para mayor seguridad.
 import dotenv from "dotenv"; //Esto sirve para cargar las variables de entorno desde el archivo .env, por ejemplo process.env.PORT o process.env.JWT_SECRET
 
+import { swaggerDocs } from "./src/docs/swagger.js";
+
 // Rutas
 import rAuth from "./src/modules/auth/rAuth.js";
 import rAppointment from "./src/modules/appointment/rAppointment.js";
@@ -22,6 +24,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+swaggerDocs(app);
 
 // Rutas públicas y protegidas
 app.use("/api/auth", rAuth);
