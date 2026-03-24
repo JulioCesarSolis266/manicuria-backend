@@ -20,6 +20,30 @@ const sUSer = {
     });
   },
 
+  getOne: async (id) => {
+    const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+      select: {
+        id: true,
+        name: true,
+        surname: true,
+        username: true,
+        phone: true,
+        role: true,
+        createdAt: true,
+        isActive: true,
+      },
+    });
+
+    if (!user) {
+      const error = new Error("Usuario no encontrado");
+      error.status = 404;
+      throw error;
+    }
+
+    return user;
+  },
+
   create: async ({ username, phone, password, name, surname }) => {
     if (!username || !phone || !password) {
       const error = new Error(

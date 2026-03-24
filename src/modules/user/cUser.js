@@ -11,6 +11,17 @@ const cUser = {
     }
   },
 
+  getOne: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = await sUser.getOne(id);
+      res.status(200).json(user);
+    } catch (error) {
+      if (error.status === 404) return mError.e404(res, error.message);
+      mError.e500(res, "Error al obtener usuario", error);
+    }
+  },
+
   create: async (req, res) => {
     try {
       const user = await sUser.create(req.body);

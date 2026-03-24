@@ -7,6 +7,8 @@ const router = Router();
 
 // Todas requieren autenticación + rol admin
 router.get("/", mAuth, mRole("admin"), cUser.getAll);
+
+router.get("/:id", mAuth, mRole("admin"), cUser.getOne);
 router.post("/", mAuth, mRole("admin"), cUser.create);
 
 router.put("/:id", mAuth, mRole("admin"), cUser.update);
