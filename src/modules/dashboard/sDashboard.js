@@ -1,20 +1,18 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { dashboardRepository } from "./dashboardRepository.js";
 
 const sDashboard = {
   getStats: async () => {
-    const totalClients = await prisma.client.count();
-
-    const allAppointments = await prisma.appointment.count();
-
-    const completedAppointments = await prisma.appointment.count({
-      where: { status: "completed" },
-    });
-
-    const pendingAppointments = await prisma.appointment.count({
-      where: { status: "pending" },
-    });
+    const [
+      totalClients,
+      allAppointments,
+      completedAppointments,
+      pendingAppointments,
+    ] = await Promise.all([
+      dashboardRepository.countClients(),
+      dashboardRepository.countAllAppointments(),
+      dashboardRepository.countAppointmentsByStatus("completed"),
+      dashboardRepository.countAppointmentsByStatus("pending"),
+    ]);
 
     return {
       totalClients,
