@@ -1,39 +1,13 @@
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { userRepository } from "./userRepository.js";
 
-const prisma = new PrismaClient();
-
-const sUSer = {
+const sUser = {
   getAll: async () => {
-    return await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        surname: true,
-        username: true,
-        phone: true,
-        role: true,
-        createdAt: true,
-        isActive: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    return await userRepository.findAll();
   },
 
   getOne: async (id) => {
-    const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
-      select: {
-        id: true,
-        name: true,
-        surname: true,
-        username: true,
-        phone: true,
-        role: true,
-        createdAt: true,
-        isActive: true,
-      },
-    });
+    const user = await userRepository.findByIdWithSelect(Number(id));
 
     if (!user) {
       const error = new Error("Usuario no encontrado");
@@ -53,9 +27,10 @@ const sUSer = {
       throw error;
     }
 
-    const existingUser = await prisma.user.findFirst({
-      where: { OR: [{ username }, { phone }] },
-    });
+    const existingUser = await userRepository.findByUsernameOrPhone(
+      username,
+      phone,
+    );
 
     if (existingUser) {
       if (!existingUser.isActive) {
@@ -73,33 +48,19 @@ const sUSer = {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    return await prisma.user.create({
-      data: {
-        username,
-        password: hashedPassword,
-        phone,
-        name: name || "Sin nombre",
-        surname: surname || "Sin apellido",
-        role: "user",
-        forcePasswordReset: true,
-      },
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        surname: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-      },
+    return await userRepository.create({
+      username,
+      password: hashedPassword,
+      phone,
+      name: name || "Sin nombre",
+      surname: surname || "Sin apellido",
+      role: "user",
+      forcePasswordReset: true,
     });
   },
 
   update: async (id, data) => {
-    const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
-    });
+    const user = await userRepository.findById(Number(id));
 
     if (!user) {
       const error = new Error("Usuario no encontrado");
@@ -118,25 +79,11 @@ const sUSer = {
       updatedData.password = await bcrypt.hash(data.password, 10);
     }
 
-    return await prisma.user.update({
-      where: { id: Number(id) },
-      data: updatedData,
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        surname: true,
-        phone: true,
-        role: true,
-        isActive: true,
-      },
-    });
+    return await userRepository.update(Number(id), updatedData);
   },
 
   deactivate: async (id) => {
-    const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
-    });
+    const user = await userRepository.findById(Number(id));
 
     if (!user) {
       const error = new Error("Usuario no encontrado");
@@ -144,17 +91,13 @@ const sUSer = {
       throw error;
     }
 
-    return await prisma.user.update({
-      where: { id: Number(id) },
-      data: { isActive: false },
-      select: { id: true, username: true, isActive: true },
+    return await userRepository.update(Number(id), {
+      isActive: false,
     });
   },
 
   reactivate: async (id) => {
-    const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
-    });
+    const user = await userRepository.findById(Number(id));
 
     if (!user) {
       const error = new Error("Usuario no encontrado");
@@ -162,17 +105,13 @@ const sUSer = {
       throw error;
     }
 
-    return await prisma.user.update({
-      where: { id: Number(id) },
-      data: { isActive: true },
-      select: { id: true, username: true, isActive: true },
+    return await userRepository.update(Number(id), {
+      isActive: true,
     });
   },
 
   delete: async (id) => {
-    const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
-    });
+    const user = await userRepository.findById(Number(id));
 
     if (!user) {
       const error = new Error("Usuario no encontrado");
@@ -180,12 +119,10 @@ const sUSer = {
       throw error;
     }
 
-    await prisma.user.delete({
-      where: { id: Number(id) },
-    });
+    await userRepository.delete(Number(id));
 
     return true;
   },
 };
 
-export default sUSer;
+export default sUser;
