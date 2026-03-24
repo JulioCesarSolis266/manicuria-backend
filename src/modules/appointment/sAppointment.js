@@ -1,4 +1,4 @@
-import { appointmentRepository } from "./appointment.repository";
+import { appointmentRepository } from "./appointmentRepository.js";
 
 const throwError = (message, status) => {
   const error = new Error(message);
