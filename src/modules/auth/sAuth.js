@@ -1,16 +1,12 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { authRepository } from "./authRepository.js";
 
 const sAuth = {
   register: async (data, user) => {
     const { name, surname, username, password, role, phone } = data;
 
-    const loggedUser = await prisma.user.findUnique({
-      where: { id: user.id },
-    });
+    const loggedUser = await authRepository.findUserById(user.id);
 
     if (!loggedUser || loggedUser.role !== "admin") {
       const error = new Error("Solo el administrador puede crear cuentas");
@@ -37,19 +33,15 @@ const sAuth = {
       throw error;
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { username: usernameClean },
-    });
+    const existingUser = await authRepository.findByUsername(usernameClean);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     if (existingUser && existingUser.isActive === false) {
-      const phoneInUse = await prisma.user.findFirst({
-        where: {
-          phone: phoneClean,
-          NOT: { id: existingUser.id },
-        },
-      });
+      const phoneInUse = await authRepository.findPhoneInUse(
+        phoneClean,
+        existingUser.id,
+      );
 
       if (phoneInUse) {
         const error = new Error("Ese teléfono ya está registrado");
@@ -57,25 +49,12 @@ const sAuth = {
         throw error;
       }
 
-      return await prisma.user.update({
-        where: { id: existingUser.id },
-        data: {
-          password: hashedPassword,
-          phone: phoneClean,
-          role: role || "user",
-          isActive: true,
-          forcePasswordReset: true,
-        },
-        select: {
-          id: true,
-          name: true,
-          surname: true,
-          username: true,
-          phone: true,
-          role: true,
-          isActive: true,
-          createdAt: true,
-        },
+      return await authRepository.updateUser(existingUser.id, {
+        password: hashedPassword,
+        phone: phoneClean,
+        role: role || "user",
+        isActive: true,
+        forcePasswordReset: true,
       });
     }
 
@@ -85,9 +64,7 @@ const sAuth = {
       throw error;
     }
 
-    const existingPhone = await prisma.user.findFirst({
-      where: { phone: phoneClean },
-    });
+    const existingPhone = await authRepository.findPhoneInUse(phoneClean);
 
     if (existingPhone) {
       const error = new Error("Ese teléfono ya está registrado");
@@ -95,27 +72,15 @@ const sAuth = {
       throw error;
     }
 
-    return await prisma.user.create({
-      data: {
-        name: nameClean,
-        surname: surnameClean,
-        username: usernameClean,
-        password: hashedPassword,
-        role: role || "user",
-        phone: phoneClean,
-        isActive: true,
-        forcePasswordReset: true,
-      },
-      select: {
-        id: true,
-        name: true,
-        surname: true,
-        username: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-      },
+    return await authRepository.createUser({
+      name: nameClean,
+      surname: surnameClean,
+      username: usernameClean,
+      password: hashedPassword,
+      role: role || "user",
+      phone: phoneClean,
+      isActive: true,
+      forcePasswordReset: true,
     });
   },
 
@@ -128,9 +93,7 @@ const sAuth = {
       throw error;
     }
 
-    const user = await prisma.user.findUnique({
-      where: { username },
-    });
+    const user = await authRepository.findByUsername(username);
 
     if (!user) {
       const error = new Error("Usuario no encontrado");

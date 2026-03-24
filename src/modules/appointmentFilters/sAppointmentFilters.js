@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { appointmentFiltersRepository } from "./appointmentFiltersRepository.js";
 
 const sAppointmentFilters = {
   filterAppointments: async ({ status, startDate, endDate }) => {
@@ -10,19 +8,29 @@ const sAppointmentFilters = {
 
     if (startDate || endDate) {
       filters.date = {};
-      if (startDate) filters.date.gte = new Date(startDate);
-      if (endDate) filters.date.lte = new Date(endDate);
+
+      if (startDate) {
+        const start = new Date(startDate);
+        if (isNaN(start.getTime())) {
+          const error = new Error("startDate inválido");
+          error.status = 400;
+          throw error;
+        }
+        filters.date.gte = start;
+      }
+
+      if (endDate) {
+        const end = new Date(endDate);
+        if (isNaN(end.getTime())) {
+          const error = new Error("endDate inválido");
+          error.status = 400;
+          throw error;
+        }
+        filters.date.lte = end;
+      }
     }
 
-    const appointments = await prisma.appointment.findMany({
-      where: filters,
-      include: {
-        client: true,
-        createdBy: { select: { id: true, username: true } },
-      },
-    });
-
-    return appointments;
+    return appointmentFiltersRepository.filter(filters);
   },
 };
 
