@@ -1,4 +1,4 @@
-import { serviceRepository } from "./serviceRepository.js";
+import { serviceRepository } from "./service.repository.js";
 
 const sService = {
   create: async (data, user) => {

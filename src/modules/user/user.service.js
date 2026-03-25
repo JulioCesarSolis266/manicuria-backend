@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { userRepository } from "./userRepository.js";
+import { userRepository } from "./user.repository.js";
 
 const sUser = {
   getAll: async () => {

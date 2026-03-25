@@ -1,7 +1,7 @@
-import sClient from "./sClient.js";
-import mError from "../../middlewares/mError.js";
+import sClient from "./client.service.js";
+import mError from "../../middlewares/error.middleware.js";
 
-const cClient = {
+const clientController = {
   create: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -86,4 +86,4 @@ const cClient = {
   },
 };
 
-export default cClient;
+export default clientController;

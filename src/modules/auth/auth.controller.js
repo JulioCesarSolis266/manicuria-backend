@@ -1,5 +1,5 @@
-import sAuth from "./sAuth.js";
-import mError from "../../middlewares/mError.js";
+import sAuth from "./auth.service.js";
+import mError from "../../middlewares/error.middleware.js";
 
 const cAuth = {
   register: async (req, res) => {

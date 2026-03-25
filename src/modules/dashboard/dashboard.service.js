@@ -1,4 +1,4 @@
-import { dashboardRepository } from "./dashboardRepository.js";
+import { dashboardRepository } from "./dashboard.repository.js";
 
 const sDashboard = {
   getStats: async () => {

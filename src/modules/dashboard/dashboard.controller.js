@@ -1,7 +1,7 @@
-import sDashboard from "./sDashboard.js";
-import mError from "../../middlewares/mError.js";
+import sDashboard from "./dashboard.service.js";
+import mError from "../../middlewares/error.middleware.js";
 
-const cDashboard = {
+const dashboardController = {
   getStats: async (req, res) => {
     try {
       const stats = await sDashboard.getStats();
@@ -16,4 +16,4 @@ const cDashboard = {
   },
 };
 
-export default cDashboard;
+export default dashboardController;

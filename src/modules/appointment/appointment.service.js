@@ -1,4 +1,4 @@
-import { appointmentRepository } from "./appointmentRepository.js";
+import { appointmentRepository } from "./appointment.repository.js";
 
 const throwError = (message, status) => {
   const error = new Error(message);
@@ -6,7 +6,7 @@ const throwError = (message, status) => {
   throw error;
 };
 
-const sAppointment = {
+const appointmentService = {
   create: async (data, user) => {
     const { serviceId, date, clientId, description } = data;
     const userId = user.id;
@@ -175,4 +175,4 @@ const sAppointment = {
   },
 };
 
-export default sAppointment;
+export default appointmentService;

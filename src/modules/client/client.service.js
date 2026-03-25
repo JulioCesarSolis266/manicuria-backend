@@ -109,7 +109,7 @@
 
 // export default sClient;
 
-import { clientRepository } from "./clientRepository.js";
+import { clientRepository } from "./client.repository.js";
 
 const sClient = {
   create: async (data, userId) => {

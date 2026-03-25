@@ -1,10 +1,10 @@
-import sAppointment from "./sAppointment.js";
-import mError from "../../middlewares/mError.js";
+import appointmentService from "./appointment.service.js";
+import mError from "../../middlewares/error.middleware.js";
 
-const cAppointment = {
+const appointmentController = {
   create: async (req, res) => {
     try {
-      const appointment = await sAppointment.create(req.body, req.user);
+      const appointment = await appointmentService.create(req.body, req.user);
 
       res.status(201).json({
         message: "Cita creada correctamente",
@@ -18,7 +18,7 @@ const cAppointment = {
 
   getAll: async (req, res) => {
     try {
-      const appointments = await sAppointment.getAll(req.user);
+      const appointments = await appointmentService.getAll(req.user);
 
       res.status(200).json({ appointments });
     } catch (error) {
@@ -28,7 +28,10 @@ const cAppointment = {
 
   getOne: async (req, res) => {
     try {
-      const appointment = await sAppointment.getOne(req.params.id, req.user);
+      const appointment = await appointmentService.getOne(
+        req.params.id,
+        req.user,
+      );
 
       res.status(200).json(appointment);
     } catch (error) {
@@ -40,7 +43,7 @@ const cAppointment = {
 
   update: async (req, res) => {
     try {
-      const appointment = await sAppointment.update(
+      const appointment = await appointmentService.update(
         req.params.id,
         req.body,
         req.user,
@@ -60,7 +63,7 @@ const cAppointment = {
 
   delete: async (req, res) => {
     try {
-      await sAppointment.delete(req.params.id, req.user);
+      await appointmentService.delete(req.params.id, req.user);
 
       res.status(200).json({
         message: "Cita eliminada correctamente",
@@ -73,4 +76,4 @@ const cAppointment = {
   },
 };
 
-export default cAppointment;
+export default appointmentController;

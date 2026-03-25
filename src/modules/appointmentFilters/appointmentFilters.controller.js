@@ -1,5 +1,5 @@
-import mError from "../../middlewares/mError.js";
-import sClient from "./sAppointmentFilters.js";
+import mError from "../../middlewares/error.middleware.js";
+import sClient from "./appointmentFilters.service.js";
 
 //Lo que hace este controlador es recibir los filtros por query params, pasarlos al servicio y devolver las citas filtradas. Si no hay citas que coincidan con los filtros, devuelve un mensaje indicando que no hay citas. Recibe filtros como status, startDate y endDate. en el endpoint se pueden usar así: /api/appointments/filters?status=confirmed&startDate=2024-01-01&endDate=2024-12-31
 const cAppointmentFilters = {

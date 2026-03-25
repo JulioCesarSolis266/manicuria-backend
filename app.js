@@ -5,16 +5,16 @@ import dotenv from "dotenv"; //Esto sirve para cargar las variables de entorno d
 import { swaggerDocs } from "./src/docs/swagger.js";
 
 // Rutas
-import rAuth from "./src/modules/auth/rAuth.js";
-import rAppointment from "./src/modules/appointment/rAppointment.js";
-import rUser from "./src/modules/user/rUser.js";
-import rClient from "./src/modules/client/rClient.js";
-import rAppointmentFilters from "./src/modules/appointmentFilters/rAppointmentFilters.js";
-import rDashboard from "./src/modules/dashboard/rDashboard.js";
-import rService from "./src/modules/service/rService.js";
+import rAuth from "./src/modules/auth/auth.routes.js";
+import rAppointment from "./src/modules/appointment/appointment.routes.js";
+import rUser from "./src/modules/user/user.routes.js";
+import rClient from "./src/modules/client/client.routes.js";
+import rAppointmentFilters from "./src/modules/appointmentFilters/appointmentFilters.routes.js";
+import rDashboard from "./src/modules/dashboard/dashboard.routes.js";
+import rService from "./src/modules/service/service.routes.js";
 
 // Middleware de errores
-import mError from "./src/middlewares/mError.js";
+import mError from "./src/middlewares/error.middleware.js";
 
 dotenv.config(); // Esto sirve para cargar las variables de entorno desde el archivo .env, por ejemplo process.env.PORT o process.env.JWT_SECRET
 

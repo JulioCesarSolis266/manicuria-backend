@@ -1,6 +1,6 @@
-import { appointmentFiltersRepository } from "./appointmentFiltersRepository.js";
+import { appointmentFiltersRepository } from "./appointmentFilters.repository.js";
 
-const sAppointmentFilters = {
+const appointmentFiltersService = {
   filterAppointments: async ({ status, startDate, endDate }) => {
     const filters = {};
 
@@ -34,4 +34,4 @@ const sAppointmentFilters = {
   },
 };
 
-export default sAppointmentFilters;
+export default appointmentFiltersService;
