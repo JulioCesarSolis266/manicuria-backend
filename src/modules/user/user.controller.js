@@ -1,11 +1,11 @@
-import sUser from "./user.service.js";
+import userService from "./user.service.js";
 import mError from "../../middlewares/error.middleware.js";
 import { idSchema, createUserSchema, updateUserSchema } from "./user.schema.js";
 
 const userController = {
   getAll: async (req, res) => {
     try {
-      const users = await sUser.getAll();
+      const users = await userService.getAll();
       res.status(200).json({ users });
     } catch (error) {
       mError.e500(res, "Error al obtener usuarios", error);
@@ -15,7 +15,7 @@ const userController = {
   getOne: async (req, res) => {
     try {
       const { id } = idSchema.parse(req.params);
-      const user = await sUser.getOne(id);
+      const user = await userService.getOne(id);
       res.status(200).json(user);
     } catch (error) {
       if (error.name === "ZodError") {
@@ -29,7 +29,7 @@ const userController = {
   create: async (req, res) => {
     try {
       const data = createUserSchema.parse(req.body);
-      const user = await sUser.create(data, req.user);
+      const user = await userService.create(data, req.user);
       res.status(201).json({ message: "Usuario creado", user });
     } catch (error) {
       if (error.name === "ZodError") {
@@ -44,7 +44,7 @@ const userController = {
     try {
       const { id } = idSchema.parse(req.params);
       const data = updateUserSchema.parse(req.body);
-      const user = await sUser.update(id, data);
+      const user = await userService.update(id, data);
 
       res.status(200).json({
         message: "Usuario actualizado",
@@ -62,7 +62,7 @@ const userController = {
   deactivate: async (req, res) => {
     try {
       const { id } = idSchema.parse(req.params);
-      const user = await sUser.deactivate(id);
+      const user = await userService.deactivate(id);
 
       res.status(200).json({
         message: "Usuario desactivado",
@@ -80,7 +80,7 @@ const userController = {
   reactivate: async (req, res) => {
     try {
       const { id } = idSchema.parse(req.params);
-      const user = await sUser.reactivate(id);
+      const user = await userService.reactivate(id);
 
       res.status(200).json({
         message: "Usuario reactivado",
@@ -99,7 +99,7 @@ const userController = {
     try {
       const { id } = idSchema.parse(req.params);
 
-      await sUser.delete(id);
+      await userService.delete(id);
 
       res.status(200).json({
         message: "Usuario eliminado definitivamente",

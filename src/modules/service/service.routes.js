@@ -1,22 +1,22 @@
 import { Router } from "express";
 import serviceController from "./service.controller.js";
-import mAuth from "../../middlewares/auth.middleware.js";
+import authMiddleware from "../../middlewares/auth.middleware.js";
 
 const router = Router();
 
 // Crear servicio
-router.post("/", mAuth, serviceController.create);
+router.post("/", authMiddleware, serviceController.create);
 
 // Obtener todos los servicios
-router.get("/", mAuth, serviceController.getAll);
+router.get("/", authMiddleware, serviceController.getAll);
 
 // Obtener un servicio por ID
-router.get("/:id", mAuth, serviceController.getOne);
+router.get("/:id", authMiddleware, serviceController.getOne);
 
 // Actualizar un servicio
-router.put("/:id", mAuth, serviceController.update);
+router.put("/:id", authMiddleware, serviceController.update);
 
 // Eliminar un servicio
-router.delete("/:id", mAuth, serviceController.delete);
+router.delete("/:id", authMiddleware, serviceController.delete);
 
 export default router;

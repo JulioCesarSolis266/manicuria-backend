@@ -1,14 +1,14 @@
 import jwt from "jsonwebtoken";
-import mError from "./error.middleware.js";
+import errorMiddleware from "./error.middleware.js";
 
-const mAuth = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization; // Obtenemos el header Authorization
 
     // Verificamos si el header existe
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       //bearer es el tipo de token que se usa comunmente. Su nombre significa portador.
-      return mError.e401(res, "Token no proporcionado o inválido");
+      return errorMiddleware.e401(res, "Token no proporcionado o inválido");
     }
 
     // Obtenemos el token (quitamos la palabra "Bearer " porque viene en el header)
@@ -28,8 +28,8 @@ const mAuth = (req, res, next) => {
     next(); // Todo bien, seguimos adelante
   } catch (error) {
     console.error("Error en mAuth:", error.message);
-    return mError.e401(res, "Token inválido o expirado");
+    return errorMiddleware.e401(res, "Token inválido o expirado");
   }
 };
 
-export default mAuth;
+export default authMiddleware;

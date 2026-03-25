@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { authRepository } from "./auth.repository.js";
 
-const sAuth = {
+const authService = {
   register: async (data, user) => {
     const { name, surname, username, password, role, phone } = data;
 
@@ -133,4 +133,4 @@ const sAuth = {
   },
 };
 
-export default sAuth;
+export default authService;

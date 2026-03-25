@@ -1,4 +1,4 @@
-import sService from "./service.service.js";
+import serviceService from "./service.service.js";
 import mError from "../../middlewares/error.middleware.js";
 
 import {
@@ -12,7 +12,7 @@ const serviceController = {
     try {
       const data = createServiceSchema.parse(req.body);
 
-      const service = await sService.create(data, req.user);
+      const service = await serviceService.create(data, req.user);
 
       res.status(201).json({
         message: "Servicio creado",
@@ -32,7 +32,7 @@ const serviceController = {
     try {
       const includeInactive = req.query.all === "true";
 
-      const services = await sService.getAll(req.user, includeInactive);
+      const services = await serviceService.getAll(req.user, includeInactive);
 
       res.status(200).json({ services });
     } catch (error) {
@@ -44,7 +44,7 @@ const serviceController = {
     try {
       const { id } = idSchema.parse(req.params);
 
-      const service = await sService.getOne(id, req.user);
+      const service = await serviceService.getOne(id, req.user);
 
       res.status(200).json(service);
     } catch (error) {
@@ -64,7 +64,7 @@ const serviceController = {
       const { id } = idSchema.parse(req.params);
       const data = updateServiceSchema.parse(req.body);
 
-      const service = await sService.update(id, data, req.user);
+      const service = await serviceService.update(id, data, req.user);
 
       res.status(200).json({
         message: "Servicio actualizado",
@@ -86,7 +86,7 @@ const serviceController = {
     try {
       const { id } = idSchema.parse(req.params);
 
-      const service = await sService.delete(id, req.user);
+      const service = await serviceService.delete(id, req.user);
 
       res.status(200).json({
         message: "Servicio desactivado",

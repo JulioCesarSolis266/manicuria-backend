@@ -1,6 +1,6 @@
 import { serviceRepository } from "./service.repository.js";
 
-const sService = {
+const serviceService = {
   create: async (data, user) => {
     const { name, price, durationMinutes, category, description } = data;
     const userId = user.id;
@@ -109,4 +109,4 @@ const sService = {
   },
 };
 
-export default sService;
+export default serviceService;
