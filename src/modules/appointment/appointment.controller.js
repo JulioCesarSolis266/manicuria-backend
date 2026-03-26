@@ -24,7 +24,7 @@ const appointmentController = {
       if (error instanceof ZodError) {
         return res.status(400).json({
           status: 400,
-          errors: error.errors.map((e) => ({
+          errors: error.issues.map((e) => ({
             field: e.path[0],
             message: e.message,
           })),
@@ -56,7 +56,7 @@ const appointmentController = {
       if (error instanceof ZodError) {
         return res.status(400).json({
           status: 400,
-          errors: error.errors.map((e) => ({
+          errors: error.issues.map((e) => ({
             field: e.path[0],
             message: e.message,
           })),
@@ -86,7 +86,7 @@ const appointmentController = {
       if (error instanceof ZodError) {
         return res.status(400).json({
           status: 400,
-          errors: error.errors.map((e) => ({
+          errors: error.issues.map((e) => ({
             field: e.path[0],
             message: e.message,
           })),
@@ -111,7 +111,7 @@ const appointmentController = {
       if (error instanceof ZodError) {
         return res.status(400).json({
           status: 400,
-          errors: error.errors.map((e) => ({
+          errors: error.issues.map((e) => ({
             field: e.path[0],
             message: e.message,
           })),
