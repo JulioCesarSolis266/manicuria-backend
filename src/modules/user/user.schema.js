@@ -6,16 +6,18 @@ export const idSchema = z.object({
 
 export const createUserSchema = z.object({
   username: z.string().min(3).max(100),
-  phone: z.string().min(10).max(20),
-  password: z.string().min(6).max(100),
-  name: z.string().min(2).max(100).optional(),
-  surname: z.string().min(2).max(100).optional(),
+  phone: z.string().regex(/^\d{10,20}$/, "Teléfono inválido"),
+  password: z.string().min(6).max(100), // Solo para creación, no se puede actualizar la contraseña con este esquema
+  name: z.string().min(3).max(100).optional(),
+  surname: z.string().min(3).max(100).optional(),
 });
 
 export const updateUserSchema = z.object({
   username: z.string().min(3).max(100).optional(),
-  phone: z.string().min(10).max(20).optional(),
-  password: z.string().min(6).max(100).optional(),
-  name: z.string().min(2).max(100).optional(),
-  surname: z.string().min(2).max(100).optional(),
+  phone: z
+    .string()
+    .regex(/^\d{10,20}$/, "Teléfono inválido")
+    .optional(),
+  name: z.string().min(3).max(100).optional(),
+  surname: z.string().min(3).max(100).optional(),
 });

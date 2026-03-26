@@ -1,0 +1,27 @@
+import { z } from "zod";
+
+export const registerSchema = z
+  .object({
+    username: z.string().min(3).max(100),
+
+    phone: z.string().regex(/^\d{10,20}$/, "Teléfono inválido"),
+
+    password: z
+      .string()
+      .min(6, "Mínimo 6 caracteres")
+      .max(100)
+      .regex(/[A-Z]/, "Debe tener al menos una mayúscula")
+      .regex(/[a-z]/, "Debe tener al menos una minúscula")
+      .regex(/\d/, "Debe tener al menos un número"),
+
+    name: z.string().min(3).max(100).optional(),
+    surname: z.string().min(3).max(100).optional(),
+  })
+  .strict();
+
+export const loginSchema = z
+  .object({
+    username: z.string().min(3),
+    password: z.string().min(6),
+  })
+  .strict();

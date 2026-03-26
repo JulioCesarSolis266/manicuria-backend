@@ -1,18 +1,34 @@
 import clientService from "./client.service.js";
 import errorMiddleware from "../../middlewares/error.middleware.js";
+import { ZodError } from "zod";
+import {
+  createClientSchema,
+  updateClientSchema,
+  idSchema,
+} from "./client.schema.js";
 
 const clientController = {
   create: async (req, res) => {
     try {
+      const validatedData = createClientSchema.parse(req.body);
       const userId = req.user.id;
 
-      const client = await clientService.create(req.body, userId);
+      const client = await clientService.create(validatedData, userId);
 
       res.status(201).json({
         message: "Cliente creado",
         client,
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
+      }
       if (error.status === 400) return errorMiddleware.e400(res, error.message);
       errorMiddleware.e500(res, "Error al crear el cliente", error);
     }
@@ -39,13 +55,22 @@ const clientController = {
 
   getOne: async (req, res) => {
     try {
-      const { id } = req.params;
+      const { id } = idSchema.parse(req.params);
       const userId = req.user.id;
 
       const client = await clientService.getOne(id, userId);
 
       res.status(200).json(client);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
+      }
       if (error.status === 404) return errorMiddleware.e404(res, error.message);
       errorMiddleware.e500(res, "Error al obtener el cliente", error);
     }
@@ -53,16 +78,26 @@ const clientController = {
 
   update: async (req, res) => {
     try {
-      const { id } = req.params;
+      const { id } = idSchema.parse(req.params);
+      const validatedData = updateClientSchema.parse(req.body);
       const userId = req.user.id;
 
-      const client = await clientService.update(id, req.body, userId);
+      const client = await clientService.update(id, validatedData, userId);
 
       res.status(200).json({
         message: "Cliente actualizado",
         client,
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
+      }
       if (error.status === 404) return errorMiddleware.e404(res, error.message);
       errorMiddleware.e500(res, "Error al actualizar el cliente", error);
     }
@@ -70,7 +105,7 @@ const clientController = {
 
   delete: async (req, res) => {
     try {
-      const { id } = req.params;
+      const { id } = idSchema.parse(req.params);
       const userId = req.user.id;
 
       await clientService.delete(id, userId);
@@ -79,6 +114,15 @@ const clientController = {
         message: "Cliente eliminado",
       });
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
+      }
       if (error.status === 404) return errorMiddleware.e404(res, error.message);
       if (error.status === 400) return errorMiddleware.e400(res, error.message);
       errorMiddleware.e500(res, "Error al eliminar el cliente", error);

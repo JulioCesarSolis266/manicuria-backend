@@ -10,16 +10,10 @@ export const createServiceSchema = z.object({
   durationMinutes: z.coerce
     .number()
     .int("Debe ser entero")
-    .min(5, "Mínimo 5 minutos"),
+    .min(5, "Mínimo 5 minutos")
+    .max(1440, "Máximo 24 horas"),
   category: z.string().optional(),
   description: z.string().optional(),
 });
 
-export const updateServiceSchema = z.object({
-  name: z.string().min(3).optional(),
-  price: z.coerce.number().min(0).optional(),
-  durationMinutes: z.coerce.number().int().min(5).optional(),
-  category: z.string().optional(),
-  description: z.string().optional(),
-  isActive: z.coerce.boolean().optional(),
-});
+export const updateServiceSchema = createServiceSchema.partial();

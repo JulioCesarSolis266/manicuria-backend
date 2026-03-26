@@ -19,8 +19,14 @@ const serviceController = {
         service,
       });
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
 
       if (error.status === 400) return mError.e400(res, error.message);
@@ -48,8 +54,14 @@ const serviceController = {
 
       res.status(200).json(service);
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
 
       if (error.status === 404) return mError.e404(res, error.message);
@@ -71,8 +83,14 @@ const serviceController = {
         service,
       });
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
 
       if (error.status === 404) return mError.e404(res, error.message);
@@ -93,8 +111,14 @@ const serviceController = {
         service,
       });
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
 
       if (error.status === 404) return mError.e404(res, error.message);

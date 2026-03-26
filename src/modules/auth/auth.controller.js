@@ -1,10 +1,12 @@
 import authService from "./auth.service.js";
 import errorMiddleware from "../../middlewares/error.middleware.js";
+import { registerSchema, loginSchema } from "./auth.schema.js";
 
 const authController = {
   register: async (req, res) => {
     try {
-      const user = await authService.register(req.body, req.user);
+      const validatedData = registerSchema.parse(req.body);
+      const user = await authService.register(validatedData, req.user);
 
       res.status(201).json({
         message: "Usuario creado correctamente por el administrador",
@@ -20,7 +22,8 @@ const authController = {
 
   login: async (req, res) => {
     try {
-      const result = await authService.login(req.body);
+      const validatedData = loginSchema.parse(req.body);
+      const result = await authService.login(validatedData);
 
       res.status(200).json({
         message: "Inicio de sesión exitoso",

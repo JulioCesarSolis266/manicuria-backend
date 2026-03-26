@@ -18,8 +18,14 @@ const userController = {
       const user = await userService.getOne(id);
       res.status(200).json(user);
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
       if (error.status === 404) return mError.e404(res, error.message);
       mError.e500(res, "Error al obtener usuario", error);
@@ -32,8 +38,14 @@ const userController = {
       const user = await userService.create(data, req.user);
       res.status(201).json({ message: "Usuario creado", user });
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
       if (error.status === 400) return mError.e400(res, error.message);
       mError.e500(res, "Error al crear usuario", error);
@@ -51,8 +63,14 @@ const userController = {
         user,
       });
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
       if (error.status === 404) return mError.e404(res, error.message);
       mError.e500(res, "Error al actualizar usuario", error);
@@ -69,8 +87,14 @@ const userController = {
         user,
       });
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
       if (error.status === 404) return mError.e404(res, error.message);
       mError.e500(res, "Error al desactivar usuario", error);
@@ -87,8 +111,14 @@ const userController = {
         user,
       });
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
       if (error.status === 404) return mError.e404(res, error.message);
       mError.e500(res, "Error al reactivar usuario", error);
@@ -105,8 +135,14 @@ const userController = {
         message: "Usuario eliminado definitivamente",
       });
     } catch (error) {
-      if (error.name === "ZodError") {
-        return mError.e400(res, error.errors);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          status: 400,
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        });
       }
       if (error.status === 404) return mError.e404(res, error.message);
       mError.e500(res, "Error al eliminar usuario", error);
