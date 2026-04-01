@@ -10,7 +10,7 @@ export const createClientSchema = z.object({
   phone: z
     .string()
     .transform((val) => val.replace(/\D/g, "")) // elimina todo lo que no sea número
-    .refine((val) => val.length >= 8 && val.length <= 20, {
+    .refine((val) => val.length >= 7 && val.length <= 20, {
       message: "Número inválido",
     }),
   notes: z.string().max(500).optional(),
