@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // USERS (Manicuras dueñas de la app)
 model User {
   id                 Int      @id @default(autoincrement())
@@ -22,12 +21,12 @@ model User {
   phone              String
 
   // Relaciones
-  appointments        Appointment[]
-  employees           Employee[]
-  clients             Client[]
-  services            Service[]
+  appointments     Appointment[]
+  employees        Employee[]
+  clients          Client[]
+  services         Service[]
+  scheduleSettings ScheduleSettings?
 }
-
 
 // EMPLOYEES (Empleadas de la manicura)
 model Employee {
@@ -45,7 +44,6 @@ model Employee {
   appointments Appointment[] @relation("EmployeeAppointments")
 }
 
-
 // CLIENTS (Clientes finales)
 model Client {
   id     Int  @id @default(autoincrement())
@@ -60,7 +58,6 @@ model Client {
 
   appointments Appointment[]
 }
-
 
 // SERVICES (Servicios ofrecidos)
 model Service {
@@ -78,7 +75,6 @@ model Service {
 
   appointments Appointment[]
 }
-
 
 // APPOINTMENTS (Turnos)
 model Appointment {
@@ -104,4 +100,16 @@ model Appointment {
   employee   Employee? @relation("EmployeeAppointments", fields: [employeeId], references: [id])
 
   description String?
+}
+
+model ScheduleSettings {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  maxConcurrentAppointments Int @default(1)
+  slotDuration              Int @default(30)
+  bufferMinutes             Int @default(0)
+
+  createdAt DateTime @default(now())
 }
