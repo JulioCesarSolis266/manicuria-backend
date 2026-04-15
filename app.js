@@ -13,6 +13,7 @@ import rAppointmentFilters from "./src/modules/appointmentFilters/appointmentFil
 import rDashboard from "./src/modules/dashboard/dashboard.routes.js";
 import rService from "./src/modules/service/service.routes.js";
 import scheduleSettingsRoutes from "./src/modules/scheduleSettings/scheduleSettings.routes.js";
+import availabilityRoutes from "./src/modules/availability/availability.routes.js";
 
 // Middleware de errores
 import mError from "./src/middlewares/error.middleware.js";
@@ -37,6 +38,7 @@ app.use("/api/appointments/filters", rAppointmentFilters);
 app.use("/api/dashboard", rDashboard);
 app.use("/api/services", rService);
 app.use("/api/schedule-settings", scheduleSettingsRoutes);
+app.use("/api/availability", availabilityRoutes);
 
 // Middleware para manejar rutas no encontradas
 app.use((req, res, next) => {

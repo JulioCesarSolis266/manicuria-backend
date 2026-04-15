@@ -26,6 +26,7 @@ model User {
   clients          Client[]
   services         Service[]
   scheduleSettings ScheduleSettings?
+  availabilities   Availability[]
 }
 
 // EMPLOYEES (Empleadas de la manicura)
@@ -102,6 +103,7 @@ model Appointment {
   description String?
 }
 
+// SETTINGS (Configuración de cantidad de turnos simultáneos, duración de turnos, etc.)
 model ScheduleSettings {
   id     Int  @id @default(autoincrement())
   userId Int  @unique
@@ -111,5 +113,19 @@ model ScheduleSettings {
   slotDuration              Int @default(30)
   bufferMinutes             Int @default(0)
 
+  createdAt DateTime @default(now())
+}
+
+// AVAILABILITY (Disponibilidad horaria de las empleadas)
+model Availability {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  dayOfWeek Int // 0 (domingo) a 6 (sábado)
+  startTime String // "08:00"
+  endTime   String // "20:00"
+
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
