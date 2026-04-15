@@ -8,7 +8,7 @@ export const registerSchema = z
 
     password: z
       .string()
-      .min(6, "Mínimo 6 caracteres")
+      .min(5, "Mínimo 5 caracteres")
       .max(100)
       .regex(/[A-Z]/, "Debe tener al menos una mayúscula")
       .regex(/[a-z]/, "Debe tener al menos una minúscula")
@@ -22,6 +22,6 @@ export const registerSchema = z
 export const loginSchema = z
   .object({
     username: z.string().min(3),
-    password: z.string().min(6),
+    password: z.string().min(5),
   })
   .strict();
