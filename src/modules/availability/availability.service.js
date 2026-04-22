@@ -28,6 +28,7 @@ const availabilityService = {
       dayOfWeek: slot.dayOfWeek,
       startTime: slot.startTime,
       endTime: slot.endTime,
+      isActive: slot.isActive,
     }));
 
     await availabilityRepository.createMany(formatted);
