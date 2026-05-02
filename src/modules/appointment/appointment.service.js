@@ -1,6 +1,7 @@
 import { appointmentRepository } from "./appointment.repository.js";
 import { scheduleSettingsRepository } from "../scheduleSettings/scheduleSettings.repository.js";
 import { availabilityRepository } from "../availability/availability.repository.js";
+import { fromZonedTime } from "date-fns-tz";
 
 const throwError = (message, status) => {
   const error = new Error(message);
@@ -34,7 +35,7 @@ const appointmentService = {
       throwError("serviceId y clientId deben ser numéricos", 400);
     }
 
-    const dateObj = new Date(date);
+    const dateObj = fromZonedTime(date, "America/Argentina/Buenos_Aires");
 
     if (isNaN(dateObj.getTime())) {
       throwError("La fecha es inválida", 400);
@@ -152,7 +153,9 @@ const appointmentService = {
     const now = new Date();
     const isPast = existingAppointment.date < now;
 
-    const newDate = date ? new Date(date) : existingAppointment.date;
+    const newDate = date
+      ? fromZonedTime(date, "America/Argentina/Buenos_Aires")
+      : existingAppointment.date;
 
     if (date && isNaN(newDate.getTime())) {
       throwError("La fecha es inválida", 400);
